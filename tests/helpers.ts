@@ -310,7 +310,7 @@ export function createMockApp(imageFiles: Record<string, { path: string }> = {})
 			setActiveLeaf,
 			getMostRecentLeaf,
 			mostRecentLeaf,
-			getActiveFile: () => null,
+			getActiveFile: (): null => null,
 		} as any,
 		fileManager: {
 			processFrontMatter,
