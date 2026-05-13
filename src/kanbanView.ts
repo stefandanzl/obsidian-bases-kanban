@@ -1447,7 +1447,14 @@ export class KanbanView extends BasesView {
 			const folder = normalizePath(rawFolder.trim());
 			if (folder) return folder;
 		}
-		return this.app?.workspace?.getActiveFile()?.parent?.path ?? null;
+		/**
+		 * This is fragile, but at present getTargetFolder is only called from
+		 * createQuickAddCard, which can only be called from a click on the quick add button.
+		 * so it stands to reason the active file is the .base
+		 *
+		 * keep an eye out for an extended base API that gives current path
+		 */
+		return this.app?.workspace.getActiveFile()?.parent?.path ?? null;
 	}
 
 	private sanitizeBaseFileName(title: string): string {
@@ -1482,7 +1489,6 @@ export class KanbanView extends BasesView {
 		}
 
 		const targetFolder = this.getTargetFolder();
-		// Only validate explicitly configured folders — the active-file fallback always exists.
 		const rawConfigFolder = this.config?.get('quickAddFolder');
 		const hasConfiguredFolder = typeof rawConfigFolder === 'string' && !!normalizePath(rawConfigFolder.trim());
 		if (hasConfiguredFolder && targetFolder && !this.app?.vault.getFolderByPath(targetFolder)) {

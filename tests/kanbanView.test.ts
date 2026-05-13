@@ -336,7 +336,10 @@ describe('Data Rendering - Column Rendering', () => {
 		await (view as any).createQuickAddCard('New Lane Task', 'Doing', 'High');
 
 		assert.deepStrictEqual((view as any).createFileForViewCalls, [
-			{ baseFileName: 'New Lane Task', frontmatter: { status: 'Doing', priority: 'High' } },
+			{
+				baseFileName: 'New Lane Task',
+				frontmatter: { status: 'Doing', priority: 'High' },
+			},
 		]);
 	});
 
@@ -370,7 +373,10 @@ describe('Data Rendering - Column Rendering', () => {
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
 		(app.workspace as any).getActiveFile = () =>
-			createMockTFile('projects/work.base', 'work', { path: 'projects', name: 'projects' });
+			createMockTFile('projects/work.base', 'work', {
+				path: 'projects',
+				name: 'projects',
+			});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -1996,7 +2002,9 @@ describe('Column Colors', () => {
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
-		controller.config.set('columnColors', { [PROPERTY_STATUS]: { 'To Do': 'red' } });
+		controller.config.set('columnColors', {
+			[PROPERTY_STATUS]: { 'To Do': 'red' },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2127,7 +2135,9 @@ describe('Column Colors', () => {
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
-		controller.config.set('columnColors', { [PROPERTY_STATUS]: { 'To Do': 'blue' } });
+		controller.config.set('columnColors', {
+			[PROPERTY_STATUS]: { 'To Do': 'blue' },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2215,7 +2225,9 @@ describe('Legacy Data Migration', () => {
 
 	test('config data takes priority over legacy data', () => {
 		// Config already has an order set
-		controller.config.set('columnOrders', { [PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'] });
+		controller.config.set('columnOrders', {
+			[PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'],
+		});
 
 		// Legacy data has a different order
 		const legacyData = {
@@ -2361,14 +2373,24 @@ describe('Internal Link Click Handling', () => {
 	});
 
 	test('Middle-click on an internal link opens the linked note in a background tab', () => {
-		const meetingNotesFile = { path: 'notes/Meeting Notes.md', basename: 'Meeting Notes', extension: 'md' };
+		const meetingNotesFile = {
+			path: 'notes/Meeting Notes.md',
+			basename: 'Meeting Notes',
+			extension: 'md',
+		};
 		(app as any).metadataCache.getFirstLinkpathDest = (linkpath: string) =>
 			linkpath === 'Meeting Notes' ? meetingNotesFile : null;
 
 		const link = view.containerEl.querySelector('a.internal-link') as HTMLElement;
 		assert.ok(link, 'Internal link should exist');
 
-		link.dispatchEvent(new MouseEvent('auxclick', { bubbles: true, cancelable: true, button: 1 }));
+		link.dispatchEvent(
+			new MouseEvent('auxclick', {
+				bubbles: true,
+				cancelable: true,
+				button: 1,
+			}),
+		);
 
 		assert.strictEqual(
 			app.workspace.openLinkText.calls.length,
@@ -2393,7 +2415,13 @@ describe('Internal Link Click Handling', () => {
 		const link = view.containerEl.querySelector('a.internal-link') as HTMLElement;
 		assert.ok(link, 'Internal link should exist');
 
-		link.dispatchEvent(new MouseEvent('auxclick', { bubbles: true, cancelable: true, button: 2 }));
+		link.dispatchEvent(
+			new MouseEvent('auxclick', {
+				bubbles: true,
+				cancelable: true,
+				button: 2,
+			}),
+		);
 
 		assert.strictEqual(app.workspace.getLeaf.calls.length, 0, 'Right-click should not create a new leaf');
 		assert.strictEqual(app.workspace.openLinkText.calls.length, 0, 'Right-click should not call openLinkText');
@@ -2520,7 +2548,13 @@ describe('Card Order - Persistence', () => {
 		// Simulate Sortable moving second card before first in the DOM
 		toDoBody.insertBefore(cards[1], cards[0]);
 
-		const mockEvent = { item: cards[1], from: toDoBody, to: toDoBody, oldIndex: 1, newIndex: 0 };
+		const mockEvent = {
+			item: cards[1],
+			from: toDoBody,
+			to: toDoBody,
+			oldIndex: 1,
+			newIndex: 0,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		const savedOrders = controller.config.get('cardOrders') as Record<string, Record<string, string[]>>;
@@ -2551,7 +2585,13 @@ describe('Card Order - Persistence', () => {
 		toDoBody.insertBefore(cards[1], cards[0]);
 
 		const noticeStart = noticeMessages().length;
-		const mockEvent = { item: cards[1], from: toDoBody, to: toDoBody, oldIndex: 1, newIndex: 0 };
+		const mockEvent = {
+			item: cards[1],
+			from: toDoBody,
+			to: toDoBody,
+			oldIndex: 1,
+			newIndex: 0,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		const savedOrders = controller.config.get('cardOrders') as Record<string, Record<string, string[]>> | null;
@@ -2592,7 +2632,13 @@ describe('Card Order - Persistence', () => {
 		doingBody.appendChild(card);
 
 		const noticeStart = noticeMessages().length;
-		const mockEvent = { item: card, from: toDoBody, to: doingBody, oldIndex: 0, newIndex: 0 };
+		const mockEvent = {
+			item: card,
+			from: toDoBody,
+			to: doingBody,
+			oldIndex: 0,
+			newIndex: 0,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		assert.deepStrictEqual(noticeMessages().slice(noticeStart), []);
@@ -2616,7 +2662,13 @@ describe('Card Order - Persistence', () => {
 		const card = toDoBody.querySelector('.obk-card') as HTMLElement;
 
 		const noticeStart = noticeMessages().length;
-		const mockEvent = { item: card, from: toDoBody, to: toDoBody, oldIndex: 0, newIndex: 0 };
+		const mockEvent = {
+			item: card,
+			from: toDoBody,
+			to: toDoBody,
+			oldIndex: 0,
+			newIndex: 0,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		assert.deepStrictEqual(noticeMessages().slice(noticeStart), []);
@@ -2671,7 +2723,13 @@ describe('Card Order - Persistence', () => {
 		const card = toDoBody.querySelector('.obk-card') as HTMLElement;
 
 		app.fileManager.processFrontMatter.calls.length = 0;
-		const mockEvent = { item: card, from: toDoBody, to: toDoBody, oldIndex: 0, newIndex: 1 };
+		const mockEvent = {
+			item: card,
+			from: toDoBody,
+			to: toDoBody,
+			oldIndex: 0,
+			newIndex: 1,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		assert.strictEqual(app.fileManager.processFrontMatter.calls.length, 0, 'processFrontMatter should not be called');
@@ -2704,7 +2762,13 @@ describe('Card Order - Persistence', () => {
 		toDoBody.removeChild(card);
 		doingBody.appendChild(card);
 
-		const mockEvent = { item: card, from: toDoBody, to: doingBody, oldIndex: 0, newIndex: 1 };
+		const mockEvent = {
+			item: card,
+			from: toDoBody,
+			to: doingBody,
+			oldIndex: 0,
+			newIndex: 1,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		const savedOrders = controller.config.get('cardOrders') as Record<string, Record<string, string[]>>;
@@ -2727,7 +2791,9 @@ describe('Card Order - Persistence', () => {
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
 		// Save reversed order: Task 2.md before Task 1.md
-		controller.config.set('cardOrders', { [PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] } });
+		controller.config.set('cardOrders', {
+			[PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2749,7 +2815,9 @@ describe('Card Order - Persistence', () => {
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
 		controller.config.set('sort', [{ property: 'file.mtime', direction: 'DESC' }]);
-		controller.config.set('cardOrders', { [PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] } });
+		controller.config.set('cardOrders', {
+			[PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2771,7 +2839,9 @@ describe('Card Order - Persistence', () => {
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
 		// Set order before first render so _loadPrefs picks it up
-		controller.config.set('cardOrders', { [PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] } });
+		controller.config.set('cardOrders', {
+			[PROPERTY_STATUS]: { 'To Do': ['Task 2.md', 'Task 1.md'] },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2796,7 +2866,9 @@ describe('Card Order - Persistence', () => {
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 
 		// Saved order only mentions Task 2; Task 1 is new/unknown
-		controller.config.set('cardOrders', { [PROPERTY_STATUS]: { 'To Do': ['Task 2.md'] } });
+		controller.config.set('cardOrders', {
+			[PROPERTY_STATUS]: { 'To Do': ['Task 2.md'] },
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -2833,7 +2905,13 @@ describe('Card Order - Persistence', () => {
 		// Simulate Sortable moving second card before first
 		toDoBody.insertBefore(cards[1], cards[0]);
 
-		const mockEvent = { item: cards[1], from: toDoBody, to: toDoBody, oldIndex: 1, newIndex: 0 };
+		const mockEvent = {
+			item: cards[1],
+			from: toDoBody,
+			to: toDoBody,
+			oldIndex: 1,
+			newIndex: 0,
+		};
 		await (view as any).handleCardDrop(mockEvent);
 
 		// Re-render — data hasn't changed, so Bases still returns original order
@@ -3107,7 +3185,9 @@ describe('Empty Column Persistence - Remove button visibility', () => {
 		);
 
 		// Add an In Progress entry
-		const newEntry = createMockBasesEntry(createMockTFile('Task 6.md'), { [PROPERTY_STATUS]: 'In Progress' });
+		const newEntry = createMockBasesEntry(createMockTFile('Task 6.md'), {
+			[PROPERTY_STATUS]: 'In Progress',
+		});
 		controller.data.data = [...entries, newEntry];
 		triggerDataUpdate(view);
 
@@ -3268,7 +3348,9 @@ describe('Column persistence when group-by property disappears from allPropertie
 		controller = createMockQueryController(entries, TEST_PROPERTIES);
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
-		controller.config.set('columnOrders', { [PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'] });
+		controller.config.set('columnOrders', {
+			[PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'],
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -3292,7 +3374,9 @@ describe('Column persistence when group-by property disappears from allPropertie
 		controller = createMockQueryController(entries, TEST_PROPERTIES);
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
-		controller.config.set('columnOrders', { [PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'] });
+		controller.config.set('columnOrders', {
+			[PROPERTY_STATUS]: ['To Do', 'Doing', 'Done'],
+		});
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
@@ -3538,8 +3622,12 @@ describe('patchColumnCards - _dragging flag', () => {
 	});
 
 	test('when _dragging is false, cards are reordered to match newEntries', () => {
-		const a = createMockBasesEntry(createMockTFile('a.md'), { [PROPERTY_STATUS]: 'To Do' });
-		const b = createMockBasesEntry(createMockTFile('b.md'), { [PROPERTY_STATUS]: 'To Do' });
+		const a = createMockBasesEntry(createMockTFile('a.md'), {
+			[PROPERTY_STATUS]: 'To Do',
+		});
+		const b = createMockBasesEntry(createMockTFile('b.md'), {
+			[PROPERTY_STATUS]: 'To Do',
+		});
 		const controller = createMockQueryController([a, b], TEST_PROPERTIES) as any;
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
@@ -3561,8 +3649,12 @@ describe('patchColumnCards - _dragging flag', () => {
 	});
 
 	test('when _dragging is true, DOM order is not changed', () => {
-		const a = createMockBasesEntry(createMockTFile('a.md'), { [PROPERTY_STATUS]: 'To Do' });
-		const b = createMockBasesEntry(createMockTFile('b.md'), { [PROPERTY_STATUS]: 'To Do' });
+		const a = createMockBasesEntry(createMockTFile('a.md'), {
+			[PROPERTY_STATUS]: 'To Do',
+		});
+		const b = createMockBasesEntry(createMockTFile('b.md'), {
+			[PROPERTY_STATUS]: 'To Do',
+		});
 		const controller = createMockQueryController([a, b], TEST_PROPERTIES) as any;
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
