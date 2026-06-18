@@ -1300,9 +1300,10 @@ export class KanbanView extends BasesView {
 	 * uses Obsidian's native tab-header status classes so it inherits the built-in
 	 * pinned-icon look (no plugin CSS). Mirroring Obsidian's pinned tabs, it
 	 * replaces the drag handle while pinned (a pinned column can't be dragged
-	 * anyway): the handle is hidden and the pin icon takes its slot at the front
-	 * of the header. Unpinning restores the drag handle. Click unpins (matches the
-	 * "Unpin" aria-label); right-click opens the full menu.
+	 * anyway): the handle is removed and the pin icon takes its slot at the front
+	 * of the header. Unpinning restores the drag handle. The handle is removed
+	 * outright (not [hidden]) so the swap is robust regardless of CSS context.
+	 * Click unpins (matches the "Unpin" aria-label); right-click opens the menu.
 	 */
 	private syncPinIndicator(colEl: HTMLElement, isPinned: boolean, value: string, swimlaneValue: string | null): void {
 		const headerEl = colEl.querySelector<HTMLElement>(`.${CSS_CLASSES.COLUMN_HEADER}`);
@@ -1311,11 +1312,17 @@ export class KanbanView extends BasesView {
 		const existing = headerEl.querySelector('.workspace-tab-header-status-container');
 		if (!isPinned) {
 			existing?.remove();
-			if (dragHandle?.instanceOf(HTMLElement)) dragHandle.hidden = false;
+			// Restore the drag handle that was removed while pinned.
+			if (!dragHandle) {
+				const restored = headerEl.createDiv({ cls: CSS_CLASSES.COLUMN_DRAG_HANDLE });
+				restored.textContent = '⋮⋮';
+				headerEl.insertBefore(restored, headerEl.firstChild);
+			}
 			return;
 		}
-		if (dragHandle?.instanceOf(HTMLElement)) dragHandle.hidden = true;
-		if (existing) return; // already present
+		// Pinned: remove the drag handle (unusable while pinned) and show the pin.
+		dragHandle?.remove();
+		if (existing) return; // pin indicator already present
 		const pinContainer = headerEl.createDiv({ cls: 'workspace-tab-header-status-container' });
 		const pinIcon = pinContainer.createDiv({
 			cls: 'workspace-tab-header-status-icon mod-pinned',
@@ -1327,8 +1334,7 @@ export class KanbanView extends BasesView {
 			this.unsetColumnPin(value, swimlaneValue);
 		});
 		// Take the drag handle's slot at the front of the header.
-		if (dragHandle) dragHandle.before(pinContainer);
-		else headerEl.insertBefore(pinContainer, headerEl.firstChild);
+		headerEl.insertBefore(pinContainer, headerEl.firstChild);
 	}
 
 	/** Build and show the pin context menu for a column (right-click on the header). */
